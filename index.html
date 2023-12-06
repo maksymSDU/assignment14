@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    #app {
+      text-align: center;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 5px;
+      margin-top: 20px;
+    }
+    .cell {
+      width: 100px;
+      height: 100px;
+      border: 2px solid #ccc;
+      font-size: 2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<!-- ... (head section remains unchanged) ... -->
+
+<body>
+    <div id="app"></div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script>
+      new Vue({
+        el: '#app',
+        data: {
+          currentPlayer: 'X',
+          board: [
+            ['', '', ''],
+            ['', '', ''],
+            ['', '', '']
+          ],
+          winner: null
+        },
+        methods: {
+          makeMove(row, col) {
+            if (!this.board[row][col] && !this.winner) {
+              this.$set(this.board, row, this.board[row].slice()); // To ensure reactivity
+              this.$set(this.board[row], col, this.currentPlayer);
+  
+              if (this.checkWinner()) {
+                this.winner = this.currentPlayer;
+              } else {
+                this.currentPlayer = this.currentPlayer === 'X' ? 'O' : 'X';
+              }
+            }
+          },
+          checkWinner() {
+            // Check rows, columns, and diagonals for a winner
+            for (let i = 0; i < 3; i++) {
+              if (
+                this.board[i][0] === this.currentPlayer &&
+                this.board[i][1] === this.currentPlayer &&
+                this.board[i][2] === this.currentPlayer
+              ) {
+                return true; // Row
+              }
+              if (
+                this.board[0][i] === this.currentPlayer &&
+                this.board[1][i] === this.currentPlayer &&
+                this.board[2][i] === this.currentPlayer
+              ) {
+                return true; // Column
+              }
+            }
+            if (
+              this.board[0][0] === this.currentPlayer &&
+              this.board[1][1] === this.currentPlayer &&
+              this.board[2][2] === this.currentPlayer
+            ) {
+              return true; // Diagonal from top-left to bottom-right
+            }
+            if (
+              this.board[0][2] === this.currentPlayer &&
+              this.board[1][1] === this.currentPlayer &&
+              this.board[2][0] === this.currentPlayer
+            ) {
+              return true; // Diagonal from top-right to bottom-left
+            }
+            return false;
+          },
+          resetGame() {
+            this.currentPlayer = 'X';
+            this.board = [
+              ['', '', ''],
+              ['', '', ''],
+              ['', '', '']
+            ];
+            this.winner = null;
+          }
+        },
+        template: `
+          <div>
+            <h1>Tic Tac Toe</h1>
+            <div class="board">
+              <div
+                v-for="(row, rowIndex) in board"
+                :key="rowIndex"
+                class="cell"
+                v-for="(cell, colIndex) in row"
+                :key="colIndex"
+                @click="makeMove(rowIndex, colIndex)"
+              >
+                {{ cell }}
+              </div>
+            </div>
+            <div v-if="winner">
+              <h2>{{ winner }} wins!</h2>
+              <button @click="resetGame">Play Again</button>
+            </div>
+          </div>
+        `
+      });
+    </script>
+  </body>  
+</html>
